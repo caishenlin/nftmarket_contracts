@@ -88,6 +88,8 @@ abstract contract EIP712MetaTransaction is ContextUpgradeable {
         return returnData;
     }
 
+    receive() external payable {}
+
     function hashMetaTransaction(MetaTransaction memory metaTx) internal pure returns (bytes32) {
         return
             keccak256(

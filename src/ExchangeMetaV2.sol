@@ -31,8 +31,6 @@ contract ExchangeMetaV2 is ExchangeV2Core, GhostMarketTransferManager, EIP712Met
         __MetaTransaction_init_unchained("GhostExchangeV2", "1");
     }
 
-    receive() external payable {}
-
     function _msgSender()
         internal
         view
