@@ -26,7 +26,6 @@ abstract contract ExchangeV2Core is Initializable, OwnableUpgradeable, AssetMatc
     event Cancel(bytes32 hash, address maker, LibAsset.AssetType makeAssetType, LibAsset.AssetType takeAssetType);
 
     function cancel(LibOrder.Order memory order) external {
-        console.log(msg.sender);
         require(_msgSender() == order.maker, "not a maker");
         require(order.salt != 0, "0 salt can't be used");
         bytes32 orderKeyHash = LibOrder.hashKey(order);

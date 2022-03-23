@@ -60,7 +60,7 @@ describe('Exchange', async function () {
   let addOperator = false
 
   //hardhat account #3 (test accounts1)
-  let publicKey = "0x90F79bf6EB2c4f870365E785982E1f101E93b906"
+  let buyerAccountNotPayingGas = "0x90F79bf6EB2c4f870365E785982E1f101E93b906"
   let privateKey = "0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6";
 
   const domainType = [{
@@ -112,7 +112,7 @@ describe('Exchange', async function () {
 
     // TODO how to use a generic private key without the predifned one?
     // const walletTest = new ethers.Wallet(privateKey).connect(wallet0.provider);
-    // publicKey = walletTest.address
+    // buyerAccountNotPayingGas = walletTest.address
 
 
     protocol = accounts[1].address;
@@ -204,7 +204,7 @@ describe('Exchange', async function () {
 
     let message = {};
     message.nonce = parseInt(nonce);
-    message.from = publicKey;
+    message.from = buyerAccountNotPayingGas;
     message.functionSignature = functionSignature;
     message.value = value // maybe not needed, added for matchOrders error
     //console.log("signature message:", message)
@@ -220,7 +220,7 @@ describe('Exchange', async function () {
     const signature = sigUtil.signTypedData_v4(new Buffer.from(privateKey.substring(2, 66), 'hex'), {
       data: dataToSign
     });
-    console.log("sigUtil.recoverTypedSignature_v4 matches publicKey:", sigUtil.recoverTypedSignature_v4({ sig: signature, data: dataToSign }).toString()); //for test only
+    console.log("sigUtil.recoverTypedSignature_v4 matches buyerAccountNotPayingGas:", sigUtil.recoverTypedSignature_v4({ sig: signature, data: dataToSign }).toString()); //for test only
     let r = signature.slice(0, 66);
     let s = "0x".concat(signature.slice(66, 130));
     let v = "0x".concat(signature.slice(130, 132));
@@ -238,7 +238,7 @@ describe('Exchange', async function () {
     await t1.mint(owner, 100);
     let t1AsSigner = await t1.connect(wallet2);
     await t1AsSigner.approve(erc20TransferProxy.address, 10000000, { from: owner });
-    let left = Order(publicKey, Asset(ERC20, enc(t1.address), 100), ZERO, Asset(ERC20, enc(t2.address), 200), 1, 0, 0, "0xffffffff", "0x");
+    let left = Order(buyerAccountNotPayingGas, Asset(ERC20, enc(t1.address), 100), ZERO, Asset(ERC20, enc(t2.address), 200), 1, 0, 0, "0xffffffff", "0x");
     let right = Order(owner, Asset(ERC20, enc(t1.address), 100), ZERO, Asset(ERC20, enc(t2.address), 200), 1, 0, 0, "0xffffffff", "0x");
     return { left, right }
   }
@@ -246,8 +246,8 @@ describe('Exchange', async function () {
   it("Should be able to send transaction successfully to cancel order, and check Event, that emit from method, execute as MetaTx", async () => {
     const { left, right } = await mintERC20Token()
 
-    console.log("publicKey", publicKey)
-    let nonce = await testing.getNonce(publicKey);
+    console.log("buyerAccountNotPayingGas", buyerAccountNotPayingGas)
+    let nonce = await testing.getNonce(buyerAccountNotPayingGas);
 
     let {
       r,
@@ -259,19 +259,18 @@ describe('Exchange', async function () {
     let ownerAsSigner = await testing.connect(wallet3);
 
     const { events } = await (
-      await ownerAsSigner.executeMetaTransaction(publicKey, functionSignature, r, s, v, { from: accounts3 })
+      await ownerAsSigner.executeMetaTransaction(buyerAccountNotPayingGas, functionSignature, r, s, v, { from: accounts3 })
     ).wait()
     //test token approval status
     const [eventObject] = events;
     expect(eventObject.event).eq('Cancel');
     //check order maker address == _msgSender()
-    expect(eventObject.args.maker).eq(publicKey);
+    expect(eventObject.args.maker).eq(buyerAccountNotPayingGas);
 
-    var newNonce = await testing.getNonce(publicKey);
+    var newNonce = await testing.getNonce(buyerAccountNotPayingGas);
     expect(newNonce.toNumber()).eq(nonce.toNumber() + 1, "Nonce not incremented");
   });
 
-  //not functional at the moment with error message: 176e6f7420656e6f756768204261736543757272656e6379000000000000000000 = not enough BaseCurrency
   it.only("Should be able to send transaction successfully to matchOrders, execute as MetaTx", async () => {
 
     await t1.mint(owner, 100);
@@ -279,24 +278,12 @@ describe('Exchange', async function () {
 
     await t1AsSigner.approve(erc20TransferProxy.address, 10000000, { from: owner });
 
-    const left = Order(publicKey, Asset(ETH, "0x", 200), ZERO, Asset(ERC20, enc(t1.address), 100), 1, 0, 0, "0xffffffff", "0x");
+    const left = Order(buyerAccountNotPayingGas, Asset(ETH, "0x", 200), ZERO, Asset(ERC20, enc(t1.address), 100), 1, 0, 0, "0xffffffff", "0x");
     const right = Order(owner, Asset(ERC20, enc(t1.address), 100), ZERO, Asset(ETH, "0x", 200), 1, 0, 0, "0xffffffff", "0x");
 
     let signatureRight = await getSignature(right, owner);
 
-/*     ownerAsSigner = await testing.connect(wallet1)
-    await verifyBalanceChange(owner, 206, async () =>
-      verifyBalanceChange(publicKey, -200, async () =>
-        verifyBalanceChange(protocol, -6, () =>
-        ownerAsSigner.matchOrders(left, "0x", right, signatureRight, { from: publicKey, value: 300 })
-        )
-      )
-    )
-    console.log("publicKey token balance: ", (await t1.balanceOf(publicKey)).toString())
-    console.log("owner token balance: ", (await t1.balanceOf(owner)).toString())
-    exit(1) */
-
-    let nonce = await testing.getNonce(publicKey);
+    let nonce = await testing.getNonce(buyerAccountNotPayingGas);
 
     let {
       r,
@@ -309,12 +296,26 @@ describe('Exchange', async function () {
     let ownerAsSigner = await testing.connect(wallet3);
 
 
-    await ownerAsSigner.executeMetaTransaction(publicKey, functionSignature, r, s, v, { from: accounts3, value: 300 })
+    //await ownerAsSigner.executeMetaTransaction(buyerAccountNotPayingGas, functionSignature, r, s, v, { from: accounts3, value: 300 })
+
+    console.log("buyerAccountNotPayingGas token balance: ", (await t1.balanceOf(buyerAccountNotPayingGas)).toString())
+    console.log("owner token balance: ", (await t1.balanceOf(owner)).toString())
+
+    await verifyBalanceChange(owner, -200, async () =>
+      verifyBalanceChange(buyerAccountNotPayingGas, -0, async () =>
+        verifyBalanceChange(protocol, -6, () =>
+          verifyBalanceChange(testing.address, -94, () =>
+            ownerAsSigner.executeMetaTransaction(buyerAccountNotPayingGas, functionSignature, r, s, v, { from: accounts3, value: 300 })
+          )
+        )
+      )
+    )
+    console.log("buyerAccountNotPayingGas token balance: ", (await t1.balanceOf(buyerAccountNotPayingGas)).toString())
+    console.log("owner token balance: ", (await t1.balanceOf(owner)).toString())
 
 
-    var newNonce = await testing.getNonce(publicKey);
+    var newNonce = await testing.getNonce(buyerAccountNotPayingGas);
     expect(newNonce.toNumber()).eq(nonce.toNumber() + 1, "Nonce not incremented");
-
 
   });
 
