@@ -46,7 +46,7 @@ contract GhostMarketERC721 is Initializable, ERC721PresetMinterPauserAutoIdUpgra
 	 * bytes4(keccak256(_INTERFACE_ID_ERC721_GHOSTMARKET)) == 0xee40ffc1
 	 */
 	bytes4 constant _INTERFACE_ID_ERC721_GHOSTMARKET = bytes4(keccak256("_INTERFACE_ID_ERC721_GHOSTMARKET"));
-
+	
 	/**
 	 * bytes4(keccak256(_GHOSTMARKET_NFT_ROYALTIES)) == 0xee40ffc1
 	 */
@@ -69,8 +69,8 @@ contract GhostMarketERC721 is Initializable, ERC721PresetMinterPauserAutoIdUpgra
 		__ERC721_init_unchained(name, symbol);
 		__ERC721PresetMinterPauserAutoId_init_unchained(uri);
 		__Ownable_init_unchained();
-		supportsInterface(_INTERFACE_ID_ERC721_GHOSTMARKET);
-		supportsInterface(_GHOSTMARKET_NFT_ROYALTIES);
+		_registerInterface(_INTERFACE_ID_ERC721_GHOSTMARKET);
+		_registerInterface(_GHOSTMARKET_NFT_ROYALTIES);
 	}
 
 	/**

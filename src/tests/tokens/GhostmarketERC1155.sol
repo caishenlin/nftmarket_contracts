@@ -30,7 +30,7 @@ contract GhostMarketERC1155 is Initializable, ERC1155PresetMinterPauserUpgradeab
 
 	// tokenId => locked content view counter array
 	mapping(uint256 => uint256) internal _lockedContentViewTracker;
-
+    
     // tokenId => attributes array
 	mapping(uint256 => string) internal _metadataJson;
 
@@ -71,8 +71,8 @@ contract GhostMarketERC1155 is Initializable, ERC1155PresetMinterPauserUpgradeab
 		__ERC1155Pausable_init_unchained();
 		__ERC1155PresetMinterPauser_init_unchained();
 		__Ownable_init_unchained();
-		supportsInterface(_INTERFACE_ID_ERC1155_GHOSTMARKET);
-		supportsInterface(_GHOSTMARKET_NFT_ROYALTIES);
+		_registerInterface(_INTERFACE_ID_ERC1155_GHOSTMARKET);
+		_registerInterface(_GHOSTMARKET_NFT_ROYALTIES);
 		name = _name;
 		symbol = _symbol;
 		_tokenIdTracker.increment();
@@ -89,7 +89,7 @@ contract GhostMarketERC1155 is Initializable, ERC1155PresetMinterPauserUpgradeab
 	function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155PresetMinterPauserUpgradeableCustom, ERC165StorageUpgradeable) returns (bool) {
 		return super.supportsInterface(interfaceId);
 	}
-
+	
 	/**
 		* @dev check if msg.sender is owner of NFT id
 		*/

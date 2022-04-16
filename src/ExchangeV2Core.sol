@@ -3,20 +3,19 @@
 pragma solidity ^0.8.4;
 pragma abicoder v2;
 
-
-
 import "./OrderValidator.sol";
 import "./AssetMatcher.sol";
 
 import "./ITransferManager.sol";
 import "./lib/LibTransfer.sol";
-import "hardhat/console.sol";
 
 abstract contract ExchangeV2Core is Initializable, OwnableUpgradeable, AssetMatcher, TransferExecutor, OrderValidator, ITransferManager {
     using SafeMathUpgradeable for uint;
     using LibTransfer for address;
 
     uint256 private constant UINT256_MAX = 2 ** 256 - 1;
+
+    address public matchAndTransferAdmin;
 
     //state of the orders
     mapping(bytes32 => uint) public fills;
@@ -25,12 +24,31 @@ abstract contract ExchangeV2Core is Initializable, OwnableUpgradeable, AssetMatc
     event OrderFilled(bytes32 leftHash, bytes32 rightHash, address leftMaker, address rightMaker, uint newLeftFill, uint newRightFill);
     event Cancel(bytes32 hash, address maker, LibAsset.AssetType makeAssetType, LibAsset.AssetType takeAssetType);
 
+    /**
+     * @dev cancel the the given order by adding the biggest possible number to fills mapping
+     */
     function cancel(LibOrder.Order memory order) external {
         require(_msgSender() == order.maker, "not a maker");
         require(order.salt != 0, "0 salt can't be used");
         bytes32 orderKeyHash = LibOrder.hashKey(order);
         fills[orderKeyHash] = UINT256_MAX;
         emit Cancel(orderKeyHash, order.maker, order.makeAsset.assetType, order.takeAsset.assetType);
+    }
+    /**
+     * @dev call the cancel fucntion in a loop canceling multiple orders
+     */
+    function bulkCancelOrders(
+        LibOrder.Order[] memory orders
+        ) external {
+        for (uint256 i = 0; i < orders.length; i++) {
+            // we can't call this.cancel function as the _msgSender() is changed to the contract address
+            // and the _msgSender() == order.maker check fails
+            require(_msgSender() == orders[i].maker, "not a maker");
+            require(orders[i].salt != 0, "0 salt can't be used");
+            bytes32 orderKeyHash = LibOrder.hashKey(orders[i]);
+            fills[orderKeyHash] = UINT256_MAX;
+            emit Cancel(orderKeyHash, orders[i].maker, orders[i].makeAsset.assetType, orders[i].takeAsset.assetType);
+        }
     }
 
     function matchOrders(
@@ -39,8 +57,6 @@ abstract contract ExchangeV2Core is Initializable, OwnableUpgradeable, AssetMatc
         LibOrder.Order memory orderRight,
         bytes memory signatureRight
     ) external payable {
-        console.log("msg.sender:",msg.sender);
-        console.log("msg.value:",msg.value);
         validateFull(orderLeft, signatureLeft);
         validateFull(orderRight, signatureRight);
         if (orderLeft.taker != address(0)) {
@@ -50,6 +66,21 @@ abstract contract ExchangeV2Core is Initializable, OwnableUpgradeable, AssetMatc
             require(orderRight.taker == orderLeft.maker, "rightOrder.taker verification failed");
         }
 
+        matchAndTransfer(orderLeft, orderRight);
+    }
+
+    /**
+    * @dev set admin address that can use the matchAndTransferWithoutSignature function
+    */
+    function setMatchTransferAdminAccount(address mata) external onlyOwner{
+        matchAndTransferAdmin = mata;
+    }
+
+    /**
+     * @dev match orders without a signature, only admin
+     */
+    function matchAndTransferWithoutSignature(LibOrder.Order memory orderLeft, LibOrder.Order memory orderRight) external payable {
+        require(msg.sender == matchAndTransferAdmin, "not allowed to matchAndTransfer without a signature");
         matchAndTransfer(orderLeft, orderRight);
     }
 
@@ -63,12 +94,12 @@ abstract contract ExchangeV2Core is Initializable, OwnableUpgradeable, AssetMatc
         require(fill.takeValue > 0, "nothing to fill");
         (uint totalMakeValue, uint totalTakeValue) = doTransfers(makeMatch, takeMatch, fill, orderLeft, orderRight);
         if (makeMatch.assetClass == LibAsset.ETH_ASSET_CLASS) {
-            require(msg.value >= totalMakeValue, "make: not enough BaseCurrency");
+            require(msg.value >= totalMakeValue, "not enough BaseCurrency");
             if (msg.value > totalMakeValue) {
                 address(msg.sender).transferEth(msg.value - totalMakeValue);
             }
         } else if (takeMatch.assetClass == LibAsset.ETH_ASSET_CLASS) {
-            require(msg.value >= totalTakeValue, "take: not enough BaseCurrency");
+            require(msg.value >= totalTakeValue, "not enough BaseCurrency");
             if (msg.value > totalTakeValue) {
                 address(msg.sender).transferEth(msg.value - totalTakeValue);
             }
