@@ -45,6 +45,7 @@ const ORIGIN = id("ORIGIN");
 const PAYOUT = id("PAYOUT");
 
 const COLLECTION = id("COLLECTION");
+const CRYPTO_PUNKS = id("CRYPTO_PUNKS");
 
 
 
