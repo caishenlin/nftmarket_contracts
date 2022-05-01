@@ -4,9 +4,9 @@ pragma solidity ^0.8.4;
 pragma abicoder v2;
 
 import "./LibFeeSide.sol";
-import "./ITransferManager.sol";
-import "./LibOrderData.sol";
-import "./lib/BpLibrary.sol";
+import "./exchange/ITransferManager.sol";
+import "./exchange/LibOrderData.sol";
+import "./exchange/lib/BpLibrary.sol";
 import "./GhostMarketRoyalties.sol";
 import "./interfaces/IERC2981Royalties.sol";
 
