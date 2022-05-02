@@ -1,29 +1,36 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.6.9 <0.8.0;
+pragma solidity ^0.8.4;
 pragma abicoder v2;
 
-import "@rarible/royalties/contracts/IRoyaltiesProvider.sol";
+import "../../royalties/contracts/IRoyaltiesProvider.sol";
 import "./RoyaltyArtBlocks.sol";
-import "@rarible/exchange-v2/contracts/lib/BpLibrary.sol";
+import "../../lib/BpLibrary.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract RoyaltiesProviderArtBlocks is IRoyaltiesProvider, Ownable {
-    using SafeMathUpgradeable for uint;
-    using BpLibrary for uint;
+    using SafeMathUpgradeable for uint256;
+    using BpLibrary for uint256;
 
     uint96 public artblocksPercentage = 250;
 
     event ArtblocksPercentageChanged(address _who, uint96 _old, uint96 _new);
 
-    function getRoyalties(address token, uint tokenId) override external view returns(LibPart.Part[] memory) {
-
+    function getRoyalties(address token, uint256 tokenId) external view override returns (LibPart.Part[] memory) {
         RoyaltyArtBlocks artBlocks = RoyaltyArtBlocks(token);
 
         //gettign artist and additionalPayee royalty part
-        (address artistAddress, address additionalPayee, uint256 additionalPayeePercentage, uint256 royaltyFeeByID) = artBlocks.getRoyaltyData(tokenId);
+        (
+            address artistAddress,
+            address additionalPayee,
+            uint256 additionalPayeePercentage,
+            uint256 royaltyFeeByID
+        ) = artBlocks.getRoyaltyData(tokenId);
 
-        require(additionalPayeePercentage <= 100 && royaltyFeeByID <= 100, "wrong royalties percentages from artBlocks");
+        require(
+            additionalPayeePercentage <= 100 && royaltyFeeByID <= 100,
+            "wrong royalties percentages from artBlocks"
+        );
 
         //resulting royalties
         LibPart.Part[] memory result;
@@ -41,7 +48,7 @@ contract RoyaltiesProviderArtBlocks is IRoyaltiesProvider, Ownable {
             //if artblocksPercentage = 0 then result is empty
             return result;
 
-        //if royaltyFeeByID > 0 and  0 < additionalPayeePercentage < 100
+            //if royaltyFeeByID > 0 and  0 < additionalPayeePercentage < 100
         } else if (additionalPayeePercentage > 0 && additionalPayeePercentage < 100) {
             result = new LibPart.Part[](3);
 
@@ -49,7 +56,7 @@ contract RoyaltiesProviderArtBlocks is IRoyaltiesProvider, Ownable {
             result[0].account = payable(owner());
             result[0].value = artblocksPercentage;
 
-             // additional payee percentage * 100
+            // additional payee percentage * 100
             uint96 additionalPart = uint96(royaltyFeeByID.mul(100).bp(additionalPayeePercentage.mul(100)));
 
             //artist part
@@ -58,8 +65,8 @@ contract RoyaltiesProviderArtBlocks is IRoyaltiesProvider, Ownable {
 
             result[2].account = payable(additionalPayee);
             result[2].value = additionalPart;
-            
-        //if royaltyFeeByID > 0 and additionalPayeePercentage == 0 or 100
+
+            //if royaltyFeeByID > 0 and additionalPayeePercentage == 0 or 100
         } else {
             result = new LibPart.Part[](2);
 
@@ -81,16 +88,15 @@ contract RoyaltiesProviderArtBlocks is IRoyaltiesProvider, Ownable {
                 result[1].account = payable(additionalPayee);
                 result[1].value = additionalPart;
             }
-        } 
+        }
 
         return result;
     }
 
     //sets new value for artblocksPercentage
-    function setArtblocksPercentage(uint96 _artblocksPercentage) onlyOwner public {
-        require(_artblocksPercentage <= 10000,"_artblocksPercentage can't be > 100%");
+    function setArtblocksPercentage(uint96 _artblocksPercentage) public onlyOwner {
+        require(_artblocksPercentage <= 10000, "_artblocksPercentage can't be > 100%");
         emit ArtblocksPercentageChanged(_msgSender(), artblocksPercentage, _artblocksPercentage);
         artblocksPercentage = _artblocksPercentage;
     }
-
 }
