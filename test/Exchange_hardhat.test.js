@@ -82,6 +82,7 @@ describe('Exchange', async function () {
     let TestERC721V1 = await ethers.getContractFactory("GhostMarketERC721");
     let GhostERC1155contract = await ethers.getContractFactory("GhostMarketERC1155");
     let ERC721WithRoyalties = await ethers.getContractFactory("ERC721WithRoyalties");
+    let RoyaltiesRegistry = await ethers.getContractFactory("RoyaltiesRegistry")
     if (hre.network.name == 'testnet_nodeploy' && do_not_deploy) {
       console.log("using existing", hre.network.name, "contracts")
       transferProxy = await TransferProxyTest.attach("0x08a8c4804b4165E7DD52d909Eb14275CF3FB643C")
@@ -101,7 +102,10 @@ describe('Exchange', async function () {
       erc20TransferProxy = await ERC20TransferProxyTest.deploy();
       await erc20TransferProxy.__ERC20TransferProxy_init();
 
-      testing = await upgrades.deployProxy(ExchangeV2, [transferProxy.address, erc20TransferProxy.address, 300, protocol], { initializer: "__ExchangeV2_init" });
+      royaltiesRegistryProxy = await RoyaltiesRegistry.deploy();
+      await royaltiesRegistryProxy.__RoyaltiesRegistry_init();
+
+      testing = await upgrades.deployProxy(ExchangeV2, [transferProxy.address, erc20TransferProxy.address, 300, protocol, royaltiesRegistryProxy.address], { initializer: "__ExchangeV2_init" });
       transferManagerTest = await GhostMarketTransferManagerTest.deploy();
       t1 = await TestERC20.deploy();
       t2 = await TestERC20.deploy();

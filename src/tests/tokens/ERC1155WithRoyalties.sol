@@ -12,7 +12,7 @@ contract ERC1155WithRoyalties is ERC1155, ERC2981PerTokenRoyalties {
     constructor(string memory uri_) ERC1155(uri_) {}
 
     /// @inheritdoc	ERC165
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, ERC2981Base) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, ERC2981Base) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

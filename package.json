@@ -78,6 +78,7 @@
     "@openzeppelin/contracts-upgradeable": "3.4.0",
     "@openzeppelin/hardhat-upgrades": "^1.8.2",
     "@openzeppelin/test-helpers": "^0.5.15",
+    "@openzeppelin/contracts-upgradeable410": "npm:@openzeppelin/contracts-upgradeable@4.1.0",
     "eth-sig-util": "^3.0.1"
   }
 }

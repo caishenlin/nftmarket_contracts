@@ -1,22 +1,27 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.2 <0.8.0;
+pragma solidity ^0.8.4;
 
-import "./ERC721PresetMinterPauserAutoIdUpgradeableCustom.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/introspection/ERC165StorageUpgradeable.sol";
+import "./ERC1155PresetMinterPauserUpgradeableCustom.sol";
+import "@openzeppelin/contracts-upgradeable410/utils/CountersUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable410/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable410/access/OwnableUpgradeable.sol";
+
+import "@openzeppelin/contracts-upgradeable410/utils/introspection/ERC165StorageUpgradeable.sol";
 
 /**
- * @dev ERC721 token with minting, burning, pause, royalties & lock content functions.
+ * @dev ERC1155 token with minting, burning, pause, royalties & lock content functions.
  */
 
-contract GhostMarketERC721 is
+contract GhostMarketERC1155 is
     Initializable,
-    ERC721PresetMinterPauserAutoIdUpgradeableCustom,
+    ERC1155PresetMinterPauserUpgradeableCustom,
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable,
     ERC165StorageUpgradeable
 {
+    string public name;
+    string public symbol;
+
     // struct for royalties fees
     struct Royalty {
         address payable recipient;
@@ -38,8 +43,8 @@ contract GhostMarketERC721 is
     // events
     event LockedContentViewed(address msgSender, uint256 tokenId, string lockedContent);
     event MintFeesWithdrawn(address feeWithdrawer, uint256 withdrawAmount);
-    event MintFeesUpdated(address feeChanger, uint256 newValue);
-    event Minted(address toAddress, uint256 tokenId, string externalURI);
+    event MintFeesUpdated(address feeUpdater, uint256 newValue);
+    event Minted(address toAddress, uint256 tokenId, string externalURI, uint256 amount);
 
     // mint fees balance
     uint256 internal _payedMintFeesBalance;
@@ -48,9 +53,9 @@ contract GhostMarketERC721 is
     uint256 internal _ghostmarketMintFees;
 
     /**
-     * bytes4(keccak256(_INTERFACE_ID_ERC721_GHOSTMARKET)) == 0xee40ffc1
+     * bytes4(keccak256(_INTERFACE_ID_ERC1155_GHOSTMARKET)) == 0x94407210
      */
-    bytes4 constant _INTERFACE_ID_ERC721_GHOSTMARKET = bytes4(keccak256("_INTERFACE_ID_ERC721_GHOSTMARKET"));
+    bytes4 constant _INTERFACE_ID_ERC1155_GHOSTMARKET = bytes4(keccak256("_INTERFACE_ID_ERC1155_GHOSTMARKET"));
 
     /**
      * bytes4(keccak256(_GHOSTMARKET_NFT_ROYALTIES)) == 0xee40ffc1
@@ -58,25 +63,31 @@ contract GhostMarketERC721 is
     bytes4 constant _GHOSTMARKET_NFT_ROYALTIES = bytes4(keccak256("_GHOSTMARKET_NFT_ROYALTIES"));
 
     function initialize(
-        string memory name,
-        string memory symbol,
+        string memory _name,
+        string memory _symbol,
         string memory uri
-    ) public override initializer {
+    ) public virtual initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __AccessControl_init_unchained();
         __AccessControlEnumerable_init_unchained();
-        __ERC721Enumerable_init_unchained();
-        __ERC721Burnable_init_unchained();
+        __ERC1155_init_unchained(uri);
+        __ERC1155Burnable_init_unchained();
         __Pausable_init_unchained();
-        __ERC721Pausable_init_unchained();
-        __ERC721URIStorage_init_unchained();
-        __ERC721_init_unchained(name, symbol);
-        __ERC721PresetMinterPauserAutoId_init_unchained(uri);
+        __ERC1155Pausable_init_unchained();
+        __ERC1155PresetMinterPauser_init_unchained();
         __Ownable_init_unchained();
-        _registerInterface(_INTERFACE_ID_ERC721_GHOSTMARKET);
+        _registerInterface(_INTERFACE_ID_ERC1155_GHOSTMARKET);
         _registerInterface(_GHOSTMARKET_NFT_ROYALTIES);
+        name = _name;
+        symbol = _symbol;
+        _tokenIdTracker.increment();
     }
+
+    using CountersUpgradeable for CountersUpgradeable.Counter;
+
+    // _tokenIdTracker to generate automated token IDs
+    CountersUpgradeable.Counter private _tokenIdTracker;
 
     /**
      * @dev See {IERC165-supportsInterface}.
@@ -85,10 +96,17 @@ contract GhostMarketERC721 is
         public
         view
         virtual
-        override(ERC721PresetMinterPauserAutoIdUpgradeableCustom, ERC165StorageUpgradeable)
+        override(ERC1155PresetMinterPauserUpgradeableCustom, ERC165StorageUpgradeable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    /**
+     * @dev check if msg.sender is owner of NFT id
+     */
+    function _ownerOf(uint256 tokenId) public view returns (bool) {
+        return balanceOf(msg.sender, tokenId) != 0;
     }
 
     /**
@@ -96,7 +114,6 @@ contract GhostMarketERC721 is
      * fee basis points 10000 = 100%
      */
     function _saveRoyalties(uint256 tokenId, Royalty[] memory royalties) internal {
-        require(_exists(tokenId), "ERC721: approved query for nonexistent token");
         for (uint256 i = 0; i < royalties.length; i++) {
             require(royalties[i].recipient != address(0x0), "Recipient should be present");
             require(royalties[i].value > 0, "Royalties value should be positive");
@@ -145,6 +162,8 @@ contract GhostMarketERC721 is
      */
     function mintGhost(
         address to,
+        uint256 amount,
+        bytes memory data,
         Royalty[] memory royalties,
         string memory externalURI,
         string memory metadata,
@@ -155,19 +174,19 @@ contract GhostMarketERC721 is
             keccak256(abi.encodePacked(externalURI)) != keccak256(abi.encodePacked("")),
             "externalURI can't be empty"
         );
-        mint(to);
-        uint256 tokenId = getLastTokenID();
+        mint(to, _tokenIdTracker.current(), amount, data);
         if (royalties.length > 0) {
-            _saveRoyalties(tokenId, royalties);
+            _saveRoyalties(_tokenIdTracker.current(), royalties);
         }
         if (keccak256(abi.encodePacked(metadata)) != keccak256(abi.encodePacked(""))) {
-            _setMetadataJson(tokenId, metadata);
+            _setMetadataJson(_tokenIdTracker.current(), metadata);
         }
         if (keccak256(abi.encodePacked(lockedcontent)) != keccak256(abi.encodePacked(""))) {
-            _setLockedContent(tokenId, lockedcontent);
+            _setLockedContent(_tokenIdTracker.current(), lockedcontent);
         }
         _checkMintFees();
-        emit Minted(to, tokenId, externalURI);
+        emit Minted(to, _tokenIdTracker.current(), externalURI, amount);
+        _tokenIdTracker.increment();
     }
 
     /**
@@ -183,15 +202,6 @@ contract GhostMarketERC721 is
         (bool success, ) = msg.sender.call{value: withdrawAmount}("");
         require(success, "Transfer failed.");
         emit MintFeesWithdrawn(msg.sender, withdrawAmount);
-    }
-
-    /**
-     * @dev bulk burn NFT
-     */
-    function burnBatch(uint256[] memory tokensId) external {
-        for (uint256 i = 0; i < tokensId.length; i++) {
-            burn(tokensId[i]);
-        }
     }
 
     /**
@@ -216,7 +226,7 @@ contract GhostMarketERC721 is
      * emits LockedContentViewed event
      */
     function getLockedContent(uint256 tokenId) external {
-        require(ownerOf(tokenId) == msg.sender, "Caller must be the owner of the NFT");
+        require(_ownerOf(tokenId), "Caller must be the owner of the NFT");
         _incrementCurrentLockedContentViewTracker(tokenId);
         emit LockedContentViewed(msg.sender, tokenId, _lockedContent[tokenId]);
     }
@@ -265,6 +275,13 @@ contract GhostMarketERC721 is
             result[i] = royalties[i].value;
         }
         return result;
+    }
+
+    /**
+     * @dev current _tokenIdTracker
+     */
+    function getCurrentCounter() external view returns (uint256) {
+        return _tokenIdTracker.current();
     }
 
     uint256[50] private __gap;

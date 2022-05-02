@@ -14,7 +14,7 @@ contract ERC721WithRoyalties is ERC721, ERC2981PerTokenRoyalties {
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
 
     /// @inheritdoc	ERC165
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, ERC2981Base) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, ERC2981Base) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
