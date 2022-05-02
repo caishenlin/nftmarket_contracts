@@ -11,6 +11,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const erc20TransferProxyContract = await ethers.getContract(
     'ERC20TransferProxy'
   );
+  const royaltiesRegistryContract = await ethers.getContract('RoyaltiesRegistry');
   const feesBP = 200;
 
   const ExchangeV2_Proxy = await deploy('ExchangeV2', {
@@ -26,6 +27,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
             erc20TransferProxyContract.address,
             feesBP,
             deployer,
+            royaltiesRegistryContract.address
           ],
         },
       },
@@ -41,4 +43,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 export default func;
 func.tags = ['ExchangeV2'];
-module.exports.dependencies = ['TransferProxy', 'ERC20TransferProxy'];
+module.exports.dependencies = ['TransferProxy', 'ERC20TransferProxy', 'RoyaltiesRegistry'];
