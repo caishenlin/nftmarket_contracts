@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity >=0.6.2 <0.8.0;
 
 import "./lib/LibAsset.sol";
 
 library LibFeeSide {
-
-    enum FeeSide {NONE, MAKE, TAKE}
+    enum FeeSide {
+        NONE,
+        MAKE,
+        TAKE
+    }
 
     function getFeeSide(bytes4 make, bytes4 take) internal pure returns (FeeSide) {
         if (make == LibAsset.ETH_ASSET_CLASS) {

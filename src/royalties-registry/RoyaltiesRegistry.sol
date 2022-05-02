@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity >=0.6.2 <0.8.0;
 pragma abicoder v2;
 
-import "../royalties/contracts/IRoyaltiesProvider.sol";
-import "../royalties/contracts/LibRoyaltiesV2.sol";
-import "../royalties/contracts/LibRoyaltiesV1.sol";
-import "../royalties/contracts/LibRoyalties2981.sol";
-import "../royalties/contracts/RoyaltiesV1.sol";
-import "../royalties/contracts/RoyaltiesV2.sol";
-import "../royalties/contracts/IERC2981.sol";
+import "../royalties/IRoyaltiesProvider.sol";
+import "../royalties/LibRoyaltiesV2.sol";
+import "../royalties/LibRoyaltiesV1.sol";
+import "../royalties/LibRoyalties2981.sol";
+import "../royalties/RoyaltiesV1.sol";
+import "../royalties/RoyaltiesV2.sol";
+import "../royalties/IERC2981.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 

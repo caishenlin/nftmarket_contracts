@@ -11,7 +11,6 @@ import '@openzeppelin/hardhat-upgrades';
 import '@nomiclabs/hardhat-web3';
 import '@nomiclabs/hardhat-ganache';
 
-
 // While waiting for hardhat PR: https://github.com/nomiclabs/hardhat/pull/1542
 if (process.env.HARDHAT_FORK) {
   process.env['HARDHAT_DEPLOY_FORK'] = process.env.HARDHAT_FORK;
@@ -20,24 +19,25 @@ if (process.env.HARDHAT_FORK) {
 import {
   MAINNET_PRIVATE_KEYS,
   TESTNET_PRIVATE_KEYS,
-  ALCHEMY_PROJECT_ID
-} from './.secrets.json'
+  ALCHEMY_PROJECT_ID,
+} from './.secrets.json';
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.8.4',
-    settings: {          // See the solidity docs for advice about optimization and evmVersion
+    version: '0.7.6',
+    settings: {
+      // See the solidity docs for advice about optimization and evmVersion
       optimizer: {
         enabled: true,
         runs: 1,
-      }
-    }
+      },
+    },
   },
   namedAccounts: {
-    deployer: 0
+    deployer: 0,
   },
   networks: {
-/*     localhost: {
+    /*     localhost: {
       url: "127.0.0.1",     // Localhost
       port: 8545,            // Ganache CLI port
     }, */
@@ -58,31 +58,31 @@ const config: HardhatUserConfig = {
     localhost: {
       //accounts: accounts(),
       saveDeployments: true,
-      tags: ["local"],
+      tags: ['local'],
       //gasPrice: 0,
     },
     testnet: {
       url: 'https://eth-rinkeby.alchemyapi.io/v2/' + ALCHEMY_PROJECT_ID,
       accounts: TESTNET_PRIVATE_KEYS,
       saveDeployments: true,
-      tags: ["testnet"]
+      tags: ['testnet'],
     },
     testnet_nodeploy: {
       url: 'https://eth-rinkeby.alchemyapi.io/v2/' + ALCHEMY_PROJECT_ID,
       accounts: TESTNET_PRIVATE_KEYS,
       saveDeployments: true,
-      tags: ["testnet_nodeploy"]
+      tags: ['testnet_nodeploy'],
     },
     mainnet: {
       url: 'https://eth-mainnet.alchemyapi.io/v2/' + ALCHEMY_PROJECT_ID,
       accounts: MAINNET_PRIVATE_KEYS,
       saveDeployments: true,
-      tags: ["mainnet"],
+      tags: ['mainnet'],
     },
   },
   paths: {
     sources: 'src',
-    tests: "./test",
+    tests: './test',
   },
   gasReporter: {
     currency: 'USD',

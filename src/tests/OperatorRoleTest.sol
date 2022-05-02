@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity >=0.6.2 <0.8.0;
 
 import "../../src/OperatorRole.sol";
 
@@ -9,7 +9,7 @@ contract OperatorRoleTest is OperatorRole {
         __Ownable_init();
     }
 
-    function getSomething() external view onlyOperator returns (uint) {
+    function getSomething() external view onlyOperator returns (uint256) {
         return 10;
     }
 }

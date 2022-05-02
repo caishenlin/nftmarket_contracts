@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity >=0.6.2 <0.8.0;
 pragma abicoder v2;
 
 import "../../src/LibOrder.sol";
 
 contract LibOrderTest {
-    function calculateRemaining(LibOrder.Order calldata order, uint fill) external pure returns (uint makeAmount, uint takeAmount) {
+    function calculateRemaining(LibOrder.Order calldata order, uint256 fill)
+        external
+        pure
+        returns (uint256 makeAmount, uint256 takeAmount)
+    {
         return LibOrder.calculateRemaining(order, fill);
     }
 

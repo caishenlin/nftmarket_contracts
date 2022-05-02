@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity >=0.6.2 <0.8.0;
 
 abstract contract ERC1271 {
-
     // bytes4(keccak256("isValidSignature(bytes,bytes)")
-    bytes4 constant internal MAGICVALUE = 0x1626ba7e;
+    bytes4 internal constant MAGICVALUE = 0x1626ba7e;
 
     /**
      * @dev Should return whether the signature provided is valid for the provided data
@@ -16,5 +15,9 @@ abstract contract ERC1271 {
      * MUST NOT modify state (using STATICCALL for solc < 0.5, view modifier for solc > 0.5)
      * MUST allow external calls
      */
-    function isValidSignature(bytes32 _hash, bytes calldata _signature) virtual external view returns (bytes4 magicValue);
+    function isValidSignature(bytes32 _hash, bytes calldata _signature)
+        external
+        view
+        virtual
+        returns (bytes4 magicValue);
 }
