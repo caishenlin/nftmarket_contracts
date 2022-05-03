@@ -15,8 +15,6 @@ import "./GhostMarketRoyalties.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "hardhat/console.sol";
-
 contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarketRoyalties {
     /// @dev deprecated
     event RoyaltiesSetForToken(address indexed token, uint256 indexed tokenId, LibPart.Part[] royalties);

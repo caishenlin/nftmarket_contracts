@@ -17,9 +17,11 @@ contract GhostMarketTransferManagerTest is GhostMarketTransferManager, TransferE
         LibAsset.AssetType memory takeMatch,
         LibFill.FillResult memory fill,
         LibOrder.Order memory leftOrder,
-        LibOrder.Order memory rightOrder
+        LibOrder.Order memory rightOrder,
+        LibOrderDataV2.DataV2 memory leftOrderData,
+        LibOrderDataV2.DataV2 memory rightOrderData
     ) external payable {
-        doTransfers(makeMatch, takeMatch, fill, leftOrder, rightOrder);
+        doTransfers(makeMatch, takeMatch, fill, leftOrder, rightOrder, leftOrderData, rightOrderData);
     }
 
     function __TransferManager_init(

@@ -727,7 +727,7 @@ describe('Exchange', async function () {
           verifyBalanceChange(accounts3, -20, async () =>
             verifyBalanceChange(accounts4, -10, async () =>
               verifyBalanceChange(protocol, -6, () =>
-                matchSigner.matchOrders(left, right, { from: accounts2, value: 300, gasPrice: 0 })
+                matchSigner.matchAndTransferWithoutSignature(left, right, { from: accounts2, value: 300, gasPrice: 0 })
               )
             )
           )
