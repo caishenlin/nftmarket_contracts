@@ -161,7 +161,6 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
 
         address royaltiesProvider = address(royaltiesProviderData);
         uint256 royaltiesType = _getRoyaltiesType(royaltiesProviderData);
-        console.log("royaltiesType", royaltiesType);
         // case when royaltiesType is not set
         if (royaltiesType == 0) {
             // calculating royalties type for token
@@ -170,7 +169,6 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
             //saving royalties type
             setRoyaltiesType(token, royaltiesType, royaltiesProvider);
         }
-        console.log("royaltiesType", royaltiesType);
         //case royaltiesType = 1, royalties are set in royaltiesByToken
         if (royaltiesType == 1) {
             return royaltiesByToken[token].royalties;
@@ -239,7 +237,7 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
         return result;
     }
 
-        /// @dev tries to get royalties rarible-v1 for token and tokenId
+    /// @dev tries to get royalties rarible-v1 for token and tokenId
     function getRoyaltieGhostmarket(address token, uint256 tokenId) internal view returns (LibPart.Part[] memory) {
         GhostMarketRoyalties royalities = GhostMarketRoyalties(token);
         Royalty[] memory values = royalities.getRoyalties(tokenId);
@@ -249,30 +247,6 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
             result[i].account = values[i].recipient;
         }
         return result;
-
-        /*
-        RoyaltiesV1 v1 = RoyaltiesV1(token);
-        address payable[] memory recipients;
-        try v1.getFeeRecipients(tokenId) returns (address payable[] memory resultRecipients) {
-            recipients = resultRecipients;
-        } catch {
-            return new LibPart.Part[](0);
-        }
-        uint256[] memory values;
-        try v1.getFeeBps(tokenId) returns (uint256[] memory resultValues) {
-            values = resultValues;
-        } catch {
-            return new LibPart.Part[](0);
-        }
-        if (values.length != recipients.length) {
-            return new LibPart.Part[](0);
-        }
-        LibPart.Part[] memory result = new LibPart.Part[](values.length);
-        for (uint256 i = 0; i < values.length; i++) {
-            result[i].value = uint96(values[i]);
-            result[i].account = recipients[i];
-        }
-        return result; */
     }
 
     /// @dev tries to get royalties EIP-2981 for token and tokenId

@@ -191,14 +191,8 @@ abstract contract GhostMarketTransferManager is OwnableUpgradeable, ITransferMan
     function getRoyaltiesByAssetType(LibAsset.AssetType memory matchNft) internal returns (LibPart.Part[] memory) {
         if (matchNft.assetClass == LibAsset.ERC1155_ASSET_CLASS || matchNft.assetClass == LibAsset.ERC721_ASSET_CLASS) {
             (address token, uint256 tokenId) = abi.decode(matchNft.data, (address, uint256));
-  /*           if (IERC165Upgradeable(token).supportsInterface(LibAsset._GHOSTMARKET_NFT_ROYALTIES)) {
-                console.log("token", token);
-                console.log("tokenId", tokenId);
-                return royaltiesRegistry.getRoyalties(token, tokenId);
-	        } */
             return royaltiesRegistry.getRoyalties(token, tokenId);
         }
-
         /*else if (matchNft.assetClass == LibERC1155LazyMint.ERC1155_LAZY_ASSET_CLASS) {
             (address token, LibERC1155LazyMint.Mint1155Data memory data) = abi.decode(matchNft.data, (address, LibERC1155LazyMint.Mint1155Data));
             return data.royalties;
