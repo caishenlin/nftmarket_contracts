@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { ethers } from "hardhat";
+const { BigNumber } = require('ethers')
 
 const order = require("../order.js");
 const { enc, ETH, ERC20, ERC721, ERC1155, COLLECTION, id } = require("../assets.js");
@@ -45,7 +46,7 @@ describe("AssetMatcherCustom", function () {
       const encoded = enc(accounts[5]);
       const encodedNFT = enc(accounts[6], tokenId);
       const result = await assetMatcherCollection.connect(operator).matchAssets(order.AssetType(COLLECTION, encoded), order.AssetType(ERC1155, encodedNFT),);
-      expect(result[0]).to.be.equal(0);
+      expect(BigNumber.from(result[0])).to.be.equal(0);
     });
 
     it("Collection COLLECTION <-> ERC721 (another collection) don`t match!", async () => {
@@ -53,28 +54,28 @@ describe("AssetMatcherCustom", function () {
       const encoded = enc(accounts[5]);
       const encodedNFT = enc(accounts[6], tokenId);
       const result = await assetMatcherCollection.connect(operator).matchAssets(order.AssetType(COLLECTION, encoded), order.AssetType(ERC721, encodedNFT),);
-      expect(result[0]).to.be.equal(0);
+      expect(BigNumber.from(result[0])).to.be.equal(0);
     });
 
     it("Collection COLLECTION <-> ERC20  don`t match", async () => {
       const encoded = enc(accounts[5]);
       const encodedERC20 = enc(accounts[5]);
       const result = await assetMatcherCollection.connect(operator).matchAssets(order.AssetType(COLLECTION, encoded), order.AssetType(ERC20, encodedERC20),);
-      expect(result[0]).to.be.equal(0);
+      expect(BigNumber.from(result[0])).to.be.equal(0);
     });
 
     it("Collection COLLECTION <-> COLLECTION  don`t match", async () => {
       const encoded = enc(accounts[5]);
       const encodedCollection = enc(accounts[5]);
       const result = await assetMatcherCollection.connect(operator).matchAssets(order.AssetType(COLLECTION, encoded), order.AssetType(COLLECTION, encodedCollection),);
-      expect(result[0]).to.be.equal(0);
+      expect(BigNumber.from(result[0])).to.be.equal(0);
     });
 
     it("Collection COLLECTION <-> ETH  don`t match", async () => {
       const encoded = enc(accounts[5]);
       const encodedETH = enc(accounts[5]);
       const result = await assetMatcherCollection.connect(operator).matchAssets(order.AssetType(COLLECTION, encoded), order.AssetType(ETH, encodedETH),);
-      expect(result[0]).to.be.equal(0);
+      expect(BigNumber.from(result[0])).to.be.equal(0);
     });
   })
 });
