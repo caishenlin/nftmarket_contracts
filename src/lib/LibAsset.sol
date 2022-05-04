@@ -8,6 +8,7 @@ library LibAsset {
     bytes4 public constant ERC721_ASSET_CLASS = bytes4(keccak256("ERC721"));
     bytes4 public constant ERC1155_ASSET_CLASS = bytes4(keccak256("ERC1155"));
     bytes4 public constant _GHOSTMARKET_NFT_ROYALTIES = bytes4(keccak256("_GHOSTMARKET_NFT_ROYALTIES"));
+    bytes4 constant public COLLECTION = bytes4(keccak256("COLLECTION"));
     bytes4 public constant CRYPTO_PUNKS = bytes4(keccak256("CRYPTO_PUNKS"));
 
     bytes32 constant ASSET_TYPE_TYPEHASH = keccak256("AssetType(bytes4 assetClass,bytes data)");

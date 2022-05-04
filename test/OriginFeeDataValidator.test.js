@@ -78,6 +78,7 @@ describe('OriginFeeDataValidator', async function () {
     let TestERC20 = await ethers.getContractFactory("TestERC20");
     let TestERC721V1 = await ethers.getContractFactory("GhostMarketERC721");
     let GhostERC1155contract = await ethers.getContractFactory("GhostMarketERC1155");
+    let RoyaltiesRegistry = await ethers.getContractFactory("RoyaltiesRegistry")
     if (hre.network.name == 'testnet_nodeploy' && do_not_deploy) {
       console.log("using existing", hre.network.name, "contracts")
       transferProxy = await TransferProxyTest.attach("0x08a8c4804b4165E7DD52d909Eb14275CF3FB643C")
@@ -106,7 +107,10 @@ describe('OriginFeeDataValidator', async function () {
       erc20TransferProxy = await ERC20TransferProxyTest.deploy();
       await erc20TransferProxy.__ERC20TransferProxy_init();
 
-      testing = await upgrades.deployProxy(ExchangeV2, [transferProxy.address, erc20TransferProxy.address, 300, protocol], {
+      royaltiesRegistryProxy = await RoyaltiesRegistry.deploy();
+      await royaltiesRegistryProxy.__RoyaltiesRegistry_init();
+
+      testing = await upgrades.deployProxy(ExchangeV2, [transferProxy.address, erc20TransferProxy.address, 300, protocol, royaltiesRegistryProxy.address], {
         initializer: "__ExchangeV2_init",
         unsafeAllowLinkedLibraries: true
       });

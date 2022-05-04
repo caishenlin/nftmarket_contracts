@@ -90,7 +90,7 @@ describe('TransferExecutor', async function () {
     await account1AsSigner.setApprovalForAll(transferProxy.address, true, { from: accounts1 })
     acc1AsSigner = transferExecutorContract.connect(wallet1);
     await expectRevert(
-      acc1AsSigner.transferTest(order.Asset(ERC721, enc(ghostMarketERC721Token.address, 1), 2), accounts1, accounts2), "revert erc721 value error"
+      acc1AsSigner.transferTest(order.Asset(ERC721, enc(ghostMarketERC721Token.address, 1), 2), accounts1, accounts2), "erc721 value error"
     )
     await acc1AsSigner.transferTest(order.Asset(ERC721, enc(ghostMarketERC721Token.address, 1), 1), accounts1, accounts2)
 
