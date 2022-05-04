@@ -1,15 +1,17 @@
 import 'dotenv/config';
-import {HardhatUserConfig} from 'hardhat/types';
+import { HardhatUserConfig } from 'hardhat/types';
 import 'hardhat-deploy';
+import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-ethers';
 import 'hardhat-gas-reporter';
 import '@typechain/hardhat';
 import 'solidity-coverage';
-import {node_url, accounts} from './utils/network';
+import { node_url, accounts } from './utils/network';
 //added to run migrated js test
 import '@openzeppelin/hardhat-upgrades';
 import '@nomiclabs/hardhat-web3';
 import '@nomiclabs/hardhat-ganache';
+
 
 // While waiting for hardhat PR: https://github.com/nomiclabs/hardhat/pull/1542
 if (process.env.HARDHAT_FORK) {
@@ -62,12 +64,12 @@ const config: HardhatUserConfig = {
       accounts: accounts(process.env.HARDHAT_FORK),
       forking: process.env.HARDHAT_FORK
         ? {
-            // TODO once PR merged : network: process.env.HARDHAT_FORK,
-            url: node_url(process.env.HARDHAT_FORK),
-            blockNumber: process.env.HARDHAT_FORK_NUMBER
-              ? parseInt(process.env.HARDHAT_FORK_NUMBER)
-              : undefined,
-          }
+          // TODO once PR merged : network: process.env.HARDHAT_FORK,
+          url: node_url(process.env.HARDHAT_FORK),
+          blockNumber: process.env.HARDHAT_FORK_NUMBER
+            ? parseInt(process.env.HARDHAT_FORK_NUMBER)
+            : undefined,
+        }
         : undefined,
     },
     localhost: {

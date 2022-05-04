@@ -86,6 +86,7 @@ describe('GhostMarketTransferManager', async function () {
       await erc20TransferProxy.__ERC20TransferProxy_init();
 
       testing = await GhostMarketTransferManagerTest.deploy();
+      // TODO: Add missing parameter, likely newRoyaltiesProvider
       await testing.__TransferManager_init(transferProxy.address, erc20TransferProxy.address, 300, community);
 
       t1 = await TestERC20.deploy();
@@ -214,7 +215,7 @@ describe('GhostMarketTransferManager', async function () {
           verifyBalanceChange(accounts3, -6, async () =>
             verifyBalanceChange(accounts4, -8, async () =>
               verifyBalanceChange(protocol, -6, () =>
-              matchSigner.checkDoTransfers(left.makeAsset.assetType, left.takeAsset.assetType, [200, 1], left, right, { from: accounts2, value: 300, gasPrice: 0 })
+                matchSigner.checkDoTransfers(left.makeAsset.assetType, left.takeAsset.assetType, [200, 1], left, right, { from: accounts2, value: 300, gasPrice: 0 })
               )
             )
           )
