@@ -15,6 +15,7 @@
     "./scripts",
     "./deploy",
     "./test",
-    "typechain/**/*"
-, "deploy-copy"  ]
+    "typechain/**/*",
+    "deploy-copy"
+  ]
 }
