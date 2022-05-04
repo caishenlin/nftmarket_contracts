@@ -15,8 +15,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarketRoyalties {
-    /// @dev deprecated
-    event RoyaltiesSetForToken(address indexed token, uint256 indexed tokenId, LibPart.Part[] royalties);
     /// @dev emitted when royalties set for token in
     event RoyaltiesSetForContract(address indexed token, LibPart.Part[] royalties);
 
@@ -26,8 +24,6 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
         LibPart.Part[] royalties;
     }
 
-    /// @dev deprecated
-    mapping(bytes32 => RoyaltiesSet) public royaltiesByTokenAndTokenId;
     /// @dev stores royalties for token contract, set in setRoyaltiesByToken() method
     mapping(address => RoyaltiesSet) public royaltiesByToken;
     /// @dev stores external provider and royalties type for token contract
@@ -207,32 +203,6 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
         } catch {
             return new LibPart.Part[](0);
         }
-    }
-
-    /// @dev tries to get royalties rarible-v1 for token and tokenId
-    function getRoyaltiesRaribleV1(address token, uint256 tokenId) internal view returns (LibPart.Part[] memory) {
-        RoyaltiesV1 v1 = RoyaltiesV1(token);
-        address payable[] memory recipients;
-        try v1.getFeeRecipients(tokenId) returns (address payable[] memory resultRecipients) {
-            recipients = resultRecipients;
-        } catch {
-            return new LibPart.Part[](0);
-        }
-        uint256[] memory values;
-        try v1.getFeeBps(tokenId) returns (uint256[] memory resultValues) {
-            values = resultValues;
-        } catch {
-            return new LibPart.Part[](0);
-        }
-        if (values.length != recipients.length) {
-            return new LibPart.Part[](0);
-        }
-        LibPart.Part[] memory result = new LibPart.Part[](values.length);
-        for (uint256 i = 0; i < values.length; i++) {
-            result[i].value = uint96(values[i]);
-            result[i].account = recipients[i];
-        }
-        return result;
     }
 
     /// @dev tries to get royalties rarible-v1 for token and tokenId
