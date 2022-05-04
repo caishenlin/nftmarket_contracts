@@ -122,13 +122,14 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
 
     /// @dev calculates royalties type for token contract
     function calculateRoyaltiesType(address token, address royaltiesProvider) internal view returns (uint256) {
-        try IERC165Upgradeable(token).supportsInterface(LibAsset._GHOSTMARKET_NFT_ROYALTIES) returns (bool result) {
+
+        try IERC165Upgradeable(token).supportsInterface(LibRoyaltiesV2._INTERFACE_ID_ROYALTIES) returns(bool result) {
             if (result) {
                 return 2;
             }
-        } catch {}
+        } catch { }
 
-        try IERC165Upgradeable(token).supportsInterface(LibRoyaltiesV1._INTERFACE_ID_FEES) returns (bool result) {
+        try IERC165Upgradeable(token).supportsInterface(LibAsset._GHOSTMARKET_NFT_ROYALTIES) returns (bool result) {
             if (result) {
                 return 3;
             }
@@ -174,12 +175,12 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
 
         //case royaltiesType = 2, royalties rarible v2
         if (royaltiesType == 2) {
-            return getRoyaltieGhostmarket(token, tokenId);
+            return getRoyaltiesRaribleV2(token, tokenId);
         }
 
         //case royaltiesType = 3, royalties rarible v1
         if (royaltiesType == 3) {
-            return getRoyaltiesRaribleV1(token, tokenId);
+            return getRoyaltieGhostmarket(token, tokenId);
         }
 
         //case royaltiesType = 4, royalties from external provider
