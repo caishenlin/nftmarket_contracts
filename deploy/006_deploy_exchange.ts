@@ -2,7 +2,7 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {ethers} from 'hardhat';
 
-import {COLLECTION} from '../test/assets.js';
+import {COLLECTION, CRYPTO_PUNKS} from '../test/assets.js';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, getNamedAccounts} = hre;
@@ -45,9 +45,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const exchangeV2Contract = await ethers.getContract('ExchangeV2');
 
   await exchangeV2Contract.setAssetMatcher(COLLECTION, assetMatcherCollectionContract.address);
+  const punkTransferProxyContract = await ethers.getContract('AssetMatcherCollection');
+  await exchangeV2Contract.setTransferProxy(CRYPTO_PUNKS, punkTransferProxyContract.address)
   console.log('exchangeFeeWallet: ', deployer);
   console.log('fees value: ', feesBP / 100 + '%');
 };
 export default func;
 func.tags = ['ExchangeV2'];
-module.exports.dependencies = ['TransferProxy', 'ERC20TransferProxy', 'RoyaltiesRegistry', 'AssetMatcherCollection'];
+module.exports.dependencies = ['TransferProxy', 'ERC20TransferProxy', 'PunkTransferProxy', 'RoyaltiesRegistry', 'AssetMatcherCollection'];

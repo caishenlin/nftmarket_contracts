@@ -6,7 +6,6 @@ pragma abicoder v2;
 import "../royalties/IRoyaltiesProvider.sol";
 import "../royalties/LibRoyaltiesV2.sol";
 import "../royalties/LibRoyalties2981.sol";
-import "../royalties/RoyaltiesV1.sol";
 import "../royalties/RoyaltiesV2.sol";
 import "../royalties/IERC2981.sol";
 import "../lib/LibAsset.sol";
