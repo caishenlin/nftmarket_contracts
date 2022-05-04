@@ -27,8 +27,8 @@ describe("AssetMatcherCustom", function () {
       const encoded = enc(accounts[5]);
       const encodedNFT = enc(accounts[5], tokenId);
       const result = await assetMatcherCollection.connect(operator).matchAssets(order.AssetType(COLLECTION, encoded), order.AssetType(ERC1155, encodedNFT),);
-      await expect(result[0]).to.be.equal(ERC1155);
-      await expect(result[1]).to.be.equal(encodedNFT);
+      expect(result[0]).to.be.equal(ERC1155);
+      expect(result[1]).to.be.equal(encodedNFT);
     });
 
     it("Collection COLLECTION <-> ERC721  matches!", async () => {
