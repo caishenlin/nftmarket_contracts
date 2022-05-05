@@ -6,6 +6,8 @@
 
 #### TransferProxy
 
+#### RoyaltiesRegistry
+
 #### ExchangeV2
 
 #### ProxyAdmin
@@ -47,7 +49,7 @@ hardhat --network <network_name> deploy
 deploy individually to testnet:
 
 ```
-hardhat --network testnet deploy --tags GhostMarketERC1155
+hardhat --network testnet deploy
 ```
 
 For local deployment ganache-cli can be optionally used with the keys from:
@@ -81,6 +83,9 @@ if contracts can not be deployed because of errors, try to remove the cache && a
 
 https://github.com/wighawag/hardhat-deploy#4-hardhat-etherscan-verify
 
+```
+hardhat --network <network> etherscan-verify
+```
 
 ## Tests
 
@@ -159,7 +164,8 @@ Order execution is done by TransferManager
 
 #### Royalties
 
-Royalties percentage and receiver is extracted from GhostmarketERC1155.sol and GhostmarketERC721.sol contracts
+Royalties percentage and receiver is extracted from the RoyaltiesRegistry and can be of many forms, GhostMarketRoyalties, RaribleRoyalties, EIP2981, or others.
+
 #### Fees
 
 `protocolFee` set currently to 2%

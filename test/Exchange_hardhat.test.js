@@ -547,9 +547,9 @@ describe('Exchange', async function () {
     let encDataRight = await encDataV1JS([originDataRight_seller, addrOriginRight]);
 
     let nftPrice = 200
-    let royalities = []
+    let royalties = []
     console.log("test2")
-    const { left, right, signatureRight, matchOrdersSigner } = await prepare721sellingWithOptionalOriginRoyalties(encDataLeft, encDataRight, royalities, nftPrice)
+    const { left, right, signatureRight, matchOrdersSigner } = await prepare721sellingWithOptionalOriginRoyalties(encDataLeft, encDataRight, royalties, nftPrice)
 
 
     console.log("accounts2 royalty balance before: ", (await web3.eth.getBalance(accounts2)).toString())

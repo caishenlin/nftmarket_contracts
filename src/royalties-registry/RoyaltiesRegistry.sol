@@ -121,7 +121,7 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
             if (result) {
                 return 2;
             }
-        } catch { }
+        } catch {}
 
         try IERC165Upgradeable(token).supportsInterface(LibAsset._GHOSTMARKET_NFT_ROYALTIES) returns (bool result) {
             if (result) {
@@ -172,9 +172,9 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
             return getRoyaltiesRaribleV2(token, tokenId);
         }
 
-        //case royaltiesType = 3, royalties rarible v1
+        //case royaltiesType = 3, royalties ghostmarket
         if (royaltiesType == 3) {
-            return getRoyaltieGhostmarket(token, tokenId);
+            return getRoyaltiesGhostmarket(token, tokenId);
         }
 
         //case royaltiesType = 4, royalties from external provider
@@ -204,10 +204,10 @@ contract RoyaltiesRegistry is IRoyaltiesProvider, OwnableUpgradeable, GhostMarke
         }
     }
 
-    /// @dev tries to get royalties rarible-v1 for token and tokenId
-    function getRoyaltieGhostmarket(address token, uint256 tokenId) internal view returns (LibPart.Part[] memory) {
-        GhostMarketRoyalties royalities = GhostMarketRoyalties(token);
-        Royalty[] memory values = royalities.getRoyalties(tokenId);
+    /// @dev tries to get royalties ghostmarket for token and tokenId
+    function getRoyaltiesGhostmarket(address token, uint256 tokenId) internal view returns (LibPart.Part[] memory) {
+        GhostMarketRoyalties royalties = GhostMarketRoyalties(token);
+        Royalty[] memory values = royalties.getRoyalties(tokenId);
         LibPart.Part[] memory result = new LibPart.Part[](values.length);
         for (uint256 i = 0; i < values.length; i++) {
             result[i].value = uint96(values[i].value);

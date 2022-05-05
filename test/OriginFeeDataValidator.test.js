@@ -342,7 +342,7 @@ describe('OriginFeeDataValidator', async function () {
     }
     else {
       await verifyBalanceChange(accounts0, 228, async () =>			//200 + 6 buyerFee + (10+12 origin left) - (72 back payment)
-        verifyBalanceChange(accounts1, -186, async () =>				//200 - (10+12 royalities
+        verifyBalanceChange(accounts1, -186, async () =>				//200 - (10+12 royalties
           verifyBalanceChange(protocol, -6, () =>
             verifyBalanceChange(accounts6, -12, () =>
               verifyBalanceChange(accounts5, -10, () =>
@@ -426,7 +426,7 @@ describe('OriginFeeDataValidator', async function () {
     }
     else {
       await verifyBalanceChange(accounts0, 105, async () =>			// 100 + (2 protocol fee) + (3 origin fee)
-        verifyBalanceChange(accounts1, -90, async () =>				// 100 - (10 royalities)
+        verifyBalanceChange(accounts1, -90, async () =>				// 100 - (10 royalties)
           verifyBalanceChange(protocol, -2, () =>
             verifyBalanceChange(accounts6, -10, () =>
               verifyBalanceChange(accounts5, -3, () =>
