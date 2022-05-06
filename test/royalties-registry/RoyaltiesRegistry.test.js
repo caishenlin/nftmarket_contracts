@@ -99,7 +99,7 @@ describe('RoyaltiesRegistry, test methods', () => {
       const ERC721_V2981 = await TestERC721WithRoyaltiesV2981.deploy();
       await ERC721_V2981.initialize();                                   	//set 2981 interface
 
-      let part = await royaltiesRegistry.getRoyalties(ERC721_V2981.address, tokenId);
+      let part = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V2981.address, tokenId);
       expect(part[0].value).to.be.equal(1000);
       expect(part[0].account).to.be.equal(getRoyalties);
       expect(part.length).to.be.equal(1);
@@ -192,7 +192,7 @@ describe('RoyaltiesRegistry, test methods', () => {
       await token.mint(accounts[2], erc721TokenId1);
       await token._saveRoyalties(erc721TokenId1, royaltiesToSet)
 
-      const royalties = await royaltiesRegistry.getRoyalties(token.address, erc721TokenId1)
+      const royalties = await royaltiesRegistry['getRoyalties(address,uint256)'](token.address, erc721TokenId1)
       expect(royalties[0][0]).to.be.equal(royaltiesToSet[0][0], "royalty recepient 0");
       expect(royalties[0][1]).to.be.equal(royaltiesToSet[0][1], "token address 0");
 
@@ -246,7 +246,7 @@ describe('RoyaltiesRegistry, test methods', () => {
       ).to.be.reverted;
 
       //checking royalties
-      const royalties = await royaltiesRegistry.getRoyalties(token.address, erc721TokenId1)
+      const royalties = await royaltiesRegistry['getRoyalties(address,uint256)'](token.address, erc721TokenId1)
 
       expect(royalties[0].account).to.be.equal(newArtBlocksAddr, "artBlocks addr");
       expect(royalties[0].value).to.be.equal(250, "artBlocks value");
