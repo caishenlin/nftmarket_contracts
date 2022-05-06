@@ -68,12 +68,12 @@ describe("RoyaltiesRegistry, royalties types test", () => {
       let tx1 = await royaltiesRegistry['getRoyalties(address,uint256)'](token, defaultTokenId1);
       tx1 = await tx1.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(token)).to.be.equal(1, "correct royalties type")
-      console.log("royaltiesByToken gas used first request", tx1.gasUsed)
+      console.log("royaltiesByToken gas used first request", tx1.gasUsed.toString())
 
       let tx2 = await royaltiesRegistry['getRoyalties(address,uint256)'](token, defaultTokenId2);
       tx2 = await tx2.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(token)).to.be.equal(1, "correct royalties type")
-      console.log("royaltiesByToken gas used second request", tx2.gasUsed)
+      console.log("royaltiesByToken gas used second request", tx2.gasUsed.toString())
     })
 
     it("test royalties type = 2, royalties v2", async () => {
@@ -85,12 +85,12 @@ describe("RoyaltiesRegistry, royalties types test", () => {
       let tx1 = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V2OwnUpgrd.address, defaultTokenId1);
       tx1 = await tx1.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(ERC721_V2OwnUpgrd.address)).to.be.equal(2, "correct royalties type")
-      console.log("royalties v2 gas used first request", tx1.gasUsed)
+      console.log("royalties v2 gas used first request", tx1.gasUsed.toString())
 
       let tx2 = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V2OwnUpgrd.address, defaultTokenId2);
       tx2 = await tx2.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(ERC721_V2OwnUpgrd.address)).to.be.equal(2, "correct royalties type")
-      console.log("royalties v2 gas used second request", tx2.gasUsed)
+      console.log("royalties v2 gas used second request", tx2.gasUsed.toString())
     })
 
     it("test royalties type = 3, royalties v1", async () => {
@@ -102,12 +102,12 @@ describe("RoyaltiesRegistry, royalties types test", () => {
       let tx1 = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V1OwnUpgrd.address, defaultTokenId1);
       tx1 = await tx1.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(ERC721_V1OwnUpgrd.address)).to.be.equal(3, "correct royalties type")
-      console.log("royalties v1 gas used first request", tx1.gasUsed)
+      console.log("royalties v1 gas used first request", tx1.gasUsed.toString())
 
       let tx2 = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V1OwnUpgrd.address, defaultTokenId2);
       tx2 = await tx2.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(ERC721_V1OwnUpgrd.address)).to.be.equal(3, "correct royalties type")
-      console.log("royalties v1 gas used second request", tx2.gasUsed)
+      console.log("royalties v1 gas used second request", tx2.gasUsed.toString())
     })
 
     it("test royalties type = 4, royalties from external provider", async () => {
@@ -126,12 +126,12 @@ describe("RoyaltiesRegistry, royalties types test", () => {
       let tx1 = await royaltiesRegistry['getRoyalties(address,uint256)'](token, defaultTokenId1);
       tx1 = await tx1.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(token)).to.be.equal(4, "correct royalties type")
-      console.log("external provider gas used first request", tx1.gasUsed)
+      console.log("external provider gas used first request", tx1.gasUsed.toString())
 
       let tx2 = await royaltiesRegistry['getRoyalties(address,uint256)'](token, defaultTokenId2);
       tx2 = await tx2.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(token)).to.be.equal(4, "correct royalties type")
-      console.log("external provider gas used second request", tx2.gasUsed)
+      console.log("external provider gas used second request", tx2.gasUsed.toString())
     })
 
     it("test royalties type = 5, royalties 2981", async () => {
@@ -144,12 +144,12 @@ describe("RoyaltiesRegistry, royalties types test", () => {
       let tx1 = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V2981.address, tokenId1);
       tx1 = await tx1.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(ERC721_V2981.address)).to.be.equal(5, "correct royalties type")
-      console.log("royalties 2981 gas used first request", tx1.gasUsed)
+      console.log("royalties 2981 gas used first request", tx1.gasUsed.toString())
 
       let tx2 = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V2981.address, tokenId2);
       tx2 = await tx2.wait()
       expect(await royaltiesRegistry.getRoyaltiesType(ERC721_V2981.address)).to.be.equal(5, "correct royalties type")
-      console.log("royalties 2981 gas used second request", tx2.gasUsed)
+      console.log("royalties 2981 gas used second request", tx2.gasUsed.toString())
     })
 
     it("test royalties type = 6, no royalties contract", async () => {
@@ -157,7 +157,7 @@ describe("RoyaltiesRegistry, royalties types test", () => {
 
       await royaltiesRegistry['getRoyalties(address,uint256)'](token, defaultTokenId1)
       expect(await royaltiesRegistry.getRoyaltiesType(token)).to.be.equal(6, "type 6 ")
-      expect((await royaltiesRegistry['getRoyalties(address,uint256)'](token, defaultTokenId1)).length).to.be.equal(0, "royalties 0")
+      expect((await royaltiesRegistry.callStatic['getRoyalties(address,uint256)'](token, defaultTokenId1)).length).to.be.equal(0, "royalties 0")
     })
 
     it("should change royalties types correctly", async () => {
@@ -166,7 +166,7 @@ describe("RoyaltiesRegistry, royalties types test", () => {
       //firstly type = 6, no royalties
       await royaltiesRegistry['getRoyalties(address,uint256)'](token, defaultTokenId1)
       expect(await royaltiesRegistry.getRoyaltiesType(token)).to.be.equal(6, "type 6 ")
-      expect((await royaltiesRegistry['getRoyalties(address,uint256)'](token, defaultTokenId1)).length).to.be.equal(0, "royalties 0")
+      expect((await royaltiesRegistry.callStatic['getRoyalties(address,uint256)'](token, defaultTokenId1)).length).to.be.equal(0, "royalties 0")
 
       const testRoyaltiesProvider = await TestRoyaltiesProvider.deploy();
       await testRoyaltiesProvider.initializeProvider(token, defaultTokenId1, defaultRoyalties);
@@ -270,52 +270,4 @@ describe("RoyaltiesRegistry, royalties types test", () => {
 
   })
 
-  describe("upgrade checks", () => {
-
-    it("check storage after upgrade", async () => {
-      const token = (await TestERC721.deploy()).address;
-      const token2 = (await TestERC721.deploy()).address;
-      const token3 = (await TestERC721.deploy()).address;
-
-      const tokenId3 = 11234;
-
-      const royaltiesRegistryOld = await upgrades.deployProxy(RoyaltiesRegistryOld, [], { initializer: '__RoyaltiesRegistry_init' })
-
-      //setRoyaltiesByTokenAndTokenId
-      await royaltiesRegistryOld.setRoyaltiesByTokenAndTokenId(token, tokenId3, [[accounts[0], 1000]])
-
-      //setRoyaltiesByToken
-      await royaltiesRegistryOld.setRoyaltiesByToken(token2, [[accounts[1], 900]])
-
-      //external provider
-      const testRoyaltiesProvider = await TestRoyaltiesProvider.deploy();
-      await testRoyaltiesProvider.initializeProvider(token3, defaultTokenId1, [[accounts[0], 800]]);
-      await royaltiesRegistryOld.setProviderByToken(token3, testRoyaltiesProvider.address)
-
-      const royaltiesFromToken = await royaltiesRegistryOld.getRoyalties(token2, tokenId3)
-      const royaltiesFromProvider = await royaltiesRegistryOld.getRoyalties(token3, defaultTokenId1)
-
-      royaltiesRegistry = await upgrades.upgradeProxy(royaltiesRegistryOld.address, RoyaltiesRegistry);
-
-      expect(await royaltiesRegistry.getRoyaltiesType(token2)).to.be.equal(0, "")
-      expect(await royaltiesRegistry.getRoyaltiesType(token3)).to.be.equal(0, "")
-
-      expect((await royaltiesRegistry['getRoyalties(address,uint256)'](token, tokenId3)).length).to.be.equal(0, "royaltiesFromTokenAndTokenId")
-
-      expect((await royaltiesRegistry['getRoyalties(address,uint256)'](token2, tokenId3))[0].accounts).to.be.equal(royaltiesFromToken[0].accounts, "royaltiesFromToken")
-      expect((await royaltiesRegistry['getRoyalties(address,uint256)'](token2, tokenId3))[0].value).to.be.equal(royaltiesFromToken[0].value, "royaltiesFromToken")
-
-      expect((await royaltiesRegistry['getRoyalties(address,uint256)'](token3, defaultTokenId1))[0].accounts).to.be.equal(royaltiesFromProvider[0].accounts, "royaltiesFromProvider")
-      expect((await royaltiesRegistry['getRoyalties(address,uint256)'](token3, defaultTokenId1))[0].value).to.be.equal(royaltiesFromProvider[0].value, "royaltiesFromProvider")
-
-      await royaltiesRegistry['getRoyalties(address,uint256)'](token, tokenId3)
-      await royaltiesRegistry['getRoyalties(address,uint256)'](token2, tokenId3)
-      await royaltiesRegistry['getRoyalties(address,uint256)'](token3, tokenId3)
-
-      expect(await royaltiesRegistry.getRoyaltiesType(token2)).to.be.equal(1, "royaltiesFromToken type 1")
-      expect(await royaltiesRegistry.getRoyaltiesType(token3)).to.be.equal(4, "external provider type 4")
-
-    })
-
-  })
 });

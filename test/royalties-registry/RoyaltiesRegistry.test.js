@@ -99,7 +99,7 @@ describe('RoyaltiesRegistry, test methods', () => {
       const ERC721_V2981 = await TestERC721WithRoyaltiesV2981.deploy();
       await ERC721_V2981.initialize();                                   	//set 2981 interface
 
-      let part = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V2981.address, tokenId);
+      let part = await royaltiesRegistry.callStatic['getRoyalties(address,uint256)'](ERC721_V2981.address, tokenId);
       expect(part[0].value).to.be.equal(1000);
       expect(part[0].account).to.be.equal(getRoyalties);
       expect(part.length).to.be.equal(1);
@@ -192,7 +192,7 @@ describe('RoyaltiesRegistry, test methods', () => {
       await token.mint(accounts[2], erc721TokenId1);
       await token._saveRoyalties(erc721TokenId1, royaltiesToSet)
 
-      const royalties = await royaltiesRegistry['getRoyalties(address,uint256)'](token.address, erc721TokenId1)
+      const royalties = await royaltiesRegistry.callStatic['getRoyalties(address,uint256)'](token.address, erc721TokenId1)
       expect(royalties[0][0]).to.be.equal(royaltiesToSet[0][0], "royalty recepient 0");
       expect(royalties[0][1]).to.be.equal(royaltiesToSet[0][1], "token address 0");
 
@@ -246,7 +246,7 @@ describe('RoyaltiesRegistry, test methods', () => {
       ).to.be.reverted;
 
       //checking royalties
-      const royalties = await royaltiesRegistry['getRoyalties(address,uint256)'](token.address, erc721TokenId1)
+      const royalties = await royaltiesRegistry.callStatic['getRoyalties(address,uint256)'](token.address, erc721TokenId1)
 
       expect(royalties[0].account).to.be.equal(newArtBlocksAddr, "artBlocks addr");
       expect(royalties[0].value).to.be.equal(250, "artBlocks value");
@@ -258,25 +258,19 @@ describe('RoyaltiesRegistry, test methods', () => {
       expect(royalties[2].value).to.be.equal(660, "additional payee value");
 
       //setting new artblocksPercentage
-      let eventChangePercentage;
-      const txChangePercentage = await provider.setArtblocksPercentage(300, { from: newArtBlocksAddr })
-      // truffleAssert.eventEmitted(txChangePercentage, 'ArtblocksPercentageChanged', (ev) => {
-      //   eventChangePercentage = ev;
-      //   return true;
-      // });
-      expect(eventChangePercentage._who).to.be.equal(newArtBlocksAddr, "from artBlocks addr");
-      expect(eventChangePercentage._old).to.be.equal(250, "old percentage");
-      expect(eventChangePercentage._new).to.be.equal(300, "new percentage");
+      let txChangePercentage = await provider.connect(signers[newArtBlocksAddr]).setArtblocksPercentage(300)
+      txChangePercentage = await txChangePercentage.wait();
+      expectEvent.inReceipt(txChangePercentage, 'ArtblocksPercentageChanged', { _who: newArtBlocksAddr, _old: 250, _new: 300 })
 
       //only owner can set %
-      // await expectThrow(
-      //   provider.setArtblocksPercentage(0, { from: artBlocksAddr })
-      // );
+      await expect(
+        provider.connect(signers[artBlocksAddr]).setArtblocksPercentage(0)
+      ).to.be.reverted;
 
       // _artblocksPercentage can't be over 10000
-      // await expectThrow(
-      //   provider.setArtblocksPercentage(100000, { from: newArtBlocksAddr })
-      // );
+      await expect(
+        provider.connect(signers[newArtBlocksAddr]).setArtblocksPercentage(100000)
+      ).to.be.reverted;
     })
 
     it("using royaltiesProvider artBlocks royalties edge cases", async () => {
