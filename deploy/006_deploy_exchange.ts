@@ -47,7 +47,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await exchangeV2Contract.setAssetMatcher(COLLECTION, assetMatcherCollectionContract.address);
 
   //set punk transfer proxy
-  const punkTransferProxyContract = await ethers.getContract('AssetMatcherCollection');
+  const punkTransferProxyContract = await ethers.getContract('PunkTransferProxy');
   await exchangeV2Contract.setTransferProxy(CRYPTO_PUNKS, punkTransferProxyContract.address)
 
   console.log('deployer is: ', deployer);
