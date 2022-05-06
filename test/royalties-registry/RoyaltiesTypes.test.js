@@ -93,23 +93,6 @@ describe("RoyaltiesRegistry, royalties types test", () => {
       console.log("royalties v2 gas used second request", tx2.gasUsed.toString())
     })
 
-    it("test royalties type = 3, royalties v1", async () => {
-      const ERC721_V1OwnUpgrd = await TestERC721RoyaltyV1OwnUpgrd.connect(signers[ownerErc721]).deploy();
-      await ERC721_V1OwnUpgrd.connect(signers[ownerErc721]).initialize();
-      await ERC721_V1OwnUpgrd.mint(accounts[2], defaultTokenId1, defaultRoyalties);
-      await ERC721_V1OwnUpgrd.mint(accounts[2], defaultTokenId2, defaultRoyalties);
-
-      let tx1 = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V1OwnUpgrd.address, defaultTokenId1);
-      tx1 = await tx1.wait()
-      expect(await royaltiesRegistry.getRoyaltiesType(ERC721_V1OwnUpgrd.address)).to.be.equal(3, "correct royalties type")
-      console.log("royalties v1 gas used first request", tx1.gasUsed.toString())
-
-      let tx2 = await royaltiesRegistry['getRoyalties(address,uint256)'](ERC721_V1OwnUpgrd.address, defaultTokenId2);
-      tx2 = await tx2.wait()
-      expect(await royaltiesRegistry.getRoyaltiesType(ERC721_V1OwnUpgrd.address)).to.be.equal(3, "correct royalties type")
-      console.log("royalties v1 gas used second request", tx2.gasUsed.toString())
-    })
-
     it("test royalties type = 4, royalties from external provider", async () => {
       const token = royaltiesRegistry.address;
 
