@@ -11,11 +11,9 @@ const { expect } = chai;
 describe("RoyaltiesRegistry, royalties types test", () => {
 
   let RoyaltiesRegistry;
-  let RoyaltiesRegistryOld;
   let accounts;
   let signers = {};
 
-  let TestERC721RoyaltyV1OwnUpgrd;
   let TestERC721RoyaltyV2OwnUpgrd;
   let TestRoyaltiesProvider;
   let TestERC721WithRoyaltiesV2981;
@@ -43,8 +41,6 @@ describe("RoyaltiesRegistry, royalties types test", () => {
     defaultRoyalties = [[royaltiesAddr1, 1000], [royaltiesAddr2, 500]]
 
     RoyaltiesRegistry = await ethers.getContractFactory("RoyaltiesRegistry");
-    RoyaltiesRegistryOld = await ethers.getContractFactory("RoyaltiesRegistryOld");
-    TestERC721RoyaltyV1OwnUpgrd = await ethers.getContractFactory("TestERC721WithRoyaltiesV1OwnableUpgradeable");
     TestERC721RoyaltyV2OwnUpgrd = await ethers.getContractFactory("TestERC721WithRoyaltiesV2OwnableUpgradeable");
     TestRoyaltiesProvider = await ethers.getContractFactory("RoyaltiesProviderTest");
     TestERC721WithRoyaltiesV2981 = await ethers.getContractFactory("TestERC721WithRoyaltyV2981");
