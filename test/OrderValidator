@@ -1,9 +1,9 @@
 import { ethers } from "hardhat";
+const chai = require('chai');
+const { solidity } = require('ethereum-waffle');
+chai.use(solidity);
+const { expect } = chai;
 
-
-const OrderValidatorTest = ethers.getContractFactory("OrderValidatorTest");
-const TestERC1271 = ethers.getContractFactory("TestERC1271");
-const TestERC20 = ethers.getContractFactory("TestERC20");
 const order = require("./order.js");
 const sign = order.sign;
 const ZERO = "0x0000000000000000000000000000000000000000";
@@ -14,12 +14,20 @@ describe("OrderValidator", accounts => {
   let testing;
   let erc1271;
   let erc20;
+  let OrderValidatorTest;
+  let TestERC1271;
+  let TestERC20;
 
+  before(async () => {
+    OrderValidatorTest = await ethers.getContractFactory("OrderValidatorTest");
+    TestERC1271 = await ethers.getContractFactory("TestERC1271");
+    TestERC20 = await ethers.getContractFactory("TestERC20");
+  })
   beforeEach(async () => {
-    testing = await OrderValidatorTest.new();
+    testing = await OrderValidatorTest.deploy();
     await testing.__OrderValidatorTest_init();
-    erc1271 = await TestERC1271.new();
-    erc20 = await TestERC1271.new();
+    erc1271 = await TestERC1271.deploy();
+    erc20 = await TestERC1271.deploy();
   });
 
   it("Test1. should validate if signer is correct", async () => {
@@ -31,9 +39,9 @@ describe("OrderValidator", accounts => {
   it("Test2. should fail validate if signer is incorrect", async () => {
     const testOrder = order.Order(accounts[1], order.Asset("0xffffffff", "0x", 100), ZERO, order.Asset("0xffffffff", "0x", 200), 1, 0, 0, "0xffffffff", "0x");
     const signature = await getSignature(testOrder, accounts[2]);
-    // await expectThrow(
-    //   testing.validateOrderTest(testOrder, signature)
-    // );
+    await expect(
+      testing.validateOrderTest(testOrder, signature)
+    ).to.be.reverted;
   });
 
   it("Test3. should bypass signature if maker is msg.sender", async () => {
@@ -49,9 +57,9 @@ describe("OrderValidator", accounts => {
     const testOrder = order.Order(erc1271.address, order.Asset("0xffffffff", "0x", 100), ZERO, order.Asset("0xffffffff", "0x", 200), 1, 0, 0, "0xffffffff", "0x");
     const signature = await getSignature(testOrder, accounts[2]);
 
-    // await expectThrow(
-    //   testing.validateOrderTest(testOrder, signature)
-    // );
+    await expect(
+      testing.validateOrderTest(testOrder, signature)
+    ).to.be.reverted;
 
     await erc1271.setReturnSuccessfulValidSignature(true);
 
@@ -61,17 +69,17 @@ describe("OrderValidator", accounts => {
   it("Test5. should not validate contract don`t support ERC1271_INTERFACE", async () => {
     const testOrder = order.Order(erc20.address, order.Asset("0xffffffff", "0x", 100), ZERO, order.Asset("0xffffffff", "0x", 200), 1, 0, 0, "0xffffffff", "0x");
     const signature = await getSignature(testOrder, accounts[2]);
-    // await expectThrow(
-    //   testing.validateOrderTest(testOrder, signature)
-    // );
+    await expect(
+      testing.validateOrderTest(testOrder, signature)
+    ).to.be.reverted;
   });
 
   it("Test6. should validate IERC1271 with empty signature", async () => {
     const testOrder = order.Order(erc1271.address, order.Asset("0xffffffff", "0x", 100), ZERO, order.Asset("0xffffffff", "0x", 200), 1, 0, 0, "0xffffffff", "0x");
 
-    // await expectThrow(
-    //   testing.validateOrderTest(testOrder, "0x")
-    // );
+    await expect(
+      testing.validateOrderTest(testOrder, "0x")
+    ).to.be.reverted;
 
     await erc1271.setReturnSuccessfulValidSignature(true);
 
