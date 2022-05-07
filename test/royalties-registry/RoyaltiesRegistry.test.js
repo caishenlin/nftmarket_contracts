@@ -6,46 +6,37 @@ const { solidity } = require('ethereum-waffle');
 chai.use(solidity);
 const { expect } = chai;
 const expectEvent = require('../helpers/expectEvent.ts');
-// const truffleAssert = require('truffle-assertions');
-
-// const { expectThrow, verifyBalanceChange } = require("@daonomic/tests-common");
 
 describe('RoyaltiesRegistry, test methods', () => {
   let erc721TokenId1 = 51;
-  let erc721TokenId2 = 52;
   let royaltiesRegistry;
   let royaltiesRegistryTest;
-  let testRoyaltiesProvider;
   let accounts;
   let signers = {};
 
   let RoyaltiesRegistry;
   let RoyaltiesRegistryTest;
   let TestERC721RoyaltyV2OwnUpgrd;
-  let TestRoyaltiesProvider;
   let TestERC721RoyaltyV2Legacy;
   let RoyaltiesProviderV2Legacy;
   let TestERC721ArtBlocks;
   let RoyaltiesProviderArtBlocks;
   let TestERC721WithRoyaltiesV2981;
 
-  let ERC721_V1OwnUpgrd;
   let ERC721_V2OwnUpgrd;
 
-  beforeEach(async () => {
+  before(async () => {
     accounts = await ethers
       .getSigners()
       .then((res) => res.map((signer) => signer.address));
     accounts.map(async (x) => (signers[x] = await ethers.getSigner(x)));
+
     RoyaltiesRegistry = await ethers.getContractFactory('RoyaltiesRegistry');
     RoyaltiesRegistryTest = await ethers.getContractFactory(
       'RoyaltiesRegistryTest'
     );
     TestERC721RoyaltyV2OwnUpgrd = await ethers.getContractFactory(
       'TestERC721WithRoyaltiesV2OwnableUpgradeable'
-    );
-    TestRoyaltiesProvider = await ethers.getContractFactory(
-      'RoyaltiesProviderTest'
     );
     TestERC721RoyaltyV2Legacy = await ethers.getContractFactory(
       'TestERC721RoyaltyV2Legacy'
@@ -62,11 +53,12 @@ describe('RoyaltiesRegistry, test methods', () => {
     TestERC721WithRoyaltiesV2981 = await ethers.getContractFactory(
       'TestERC721WithRoyaltyV2981'
     );
+  });
 
+  beforeEach(async () => {
     royaltiesRegistry = await RoyaltiesRegistry.deploy();
     await royaltiesRegistry.__RoyaltiesRegistry_init();
     royaltiesRegistryTest = await RoyaltiesRegistryTest.deploy();
-    testRoyaltiesProvider = await TestRoyaltiesProvider.deploy();
   });
 
   describe('RoyaltiesRegistry token supports IERC2981:', () => {
@@ -189,7 +181,6 @@ describe('RoyaltiesRegistry, test methods', () => {
 
       //changing artBlocksAddr
       const newArtBlocksAddr = accounts[6]
-      let eventSetAddr;
       let txSetAddr = await provider.connect(signers[artBlocksAddr]).transferOwnership(newArtBlocksAddr)
       txSetAddr = await txSetAddr.wait()
       expectEvent.inReceipt(txSetAddr, 'OwnershipTransferred', { previousOwner: artBlocksAddr, newOwner: newArtBlocksAddr });

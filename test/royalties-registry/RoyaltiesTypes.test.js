@@ -1,12 +1,9 @@
-import { ethers, upgrades } from "hardhat";
-const { BigNumber } = require('ethers')
+import { ethers } from "hardhat";
 
 const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect } = chai;
-
-// const { expectThrow, verifyBalanceChange, assertEq } = require("@daonomic/tests-common");
 
 describe("RoyaltiesRegistry, royalties types test", () => {
 
